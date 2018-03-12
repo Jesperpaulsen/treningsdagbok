@@ -1,3 +1,13 @@
+package treningsdagbok;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class test 
+{
 	Connection conn = null;
 	Statement stmt=null;
 	ResultSet rs=null;
@@ -13,3 +23,44 @@
 		}
 		
 	}
+	public void insert()
+	{
+		try {
+			String query="INSERT INTO APPARAT (apparatId,navn,funksjon,beskrivelse) VALUES ('1','Benkpress','Trene bryst','Bra for alle');";
+			stmt=conn.createStatement();
+			stmt.executeUpdate(query);
+		}
+		catch(SQLException ex){
+			System.out.println("SQLException: "+ex.getMessage());
+		}
+	}
+	
+	public void sporring()
+	{
+	try {
+		stmt=conn.createStatement();
+		String query= "SELECT * FROM APPARAT";
+		if(stmt.execute(query))
+		{
+			rs=stmt.getResultSet();
+		}
+		while(rs.next())
+		{
+			String kolonne1=rs.getString(1);
+			String kolonne2=rs.getString(2);
+			System.out.println(kolonne1+"-"+kolonne2);
+		}
+		
+	}
+	catch(SQLException ex) {
+		System.out.println("SQLException: "+ex.getMessage());
+	}
+	}
+	
+	public static void main(String[] args) {
+		test test = new test();
+		test.connect();
+		test.insert();
+		test.sporring();
+	}
+}
