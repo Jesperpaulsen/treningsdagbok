@@ -1,0 +1,15 @@
+	Connection conn = null;
+	Statement stmt=null;
+	ResultSet rs=null;
+	
+	public void connect()
+	{
+		try {
+			conn=DriverManager.getConnection("jdbc:mysql://localhost:3306/treningsdagbok?user=root&password=password");
+		}
+		catch(SQLException ex)
+		{
+			System.out.println("SQLException: "+ex.getMessage());
+		}
+		
+	}
