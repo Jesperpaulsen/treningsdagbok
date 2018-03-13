@@ -1,0 +1,203 @@
+package treningsdagbok;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Scanner;
+
+public class DagbokUI 
+{
+	public Connection conn=null;
+	Statement stmt=null;
+	ResultSet rs=null;
+	
+	public void connect()
+	{
+		try {
+			conn=DriverManager.getConnection("jdbc:mysql://localhost:3306/treningsdagbok?user=root&password=password");
+		}
+		catch(SQLException ex){
+			System.out.println("SQLException: "+ex.getMessage());
+		}
+	}
+	
+	public void mainUI(Connection conn) {
+		Scanner scanner = new Scanner(System.in);
+		boolean running=true;
+		
+		String mainUI="Velkommen til treningsdagboken din! Hva ønsker du å gjøre?\n"
+		+"1: Registrere treningsøkt\n"
+		+"2: Etterregistrere øvelse til en treningsøkt\n"
+		+"3: Registrere apparat\n"
+		+"4: Lage ny øvelsesgruppe\n"
+		+"5: Se resultatlogg for en øvelse\n"
+		+"6: Se info om siste gjennomførte treningsøkter\n"
+		+"7: Statistikk om øvelsesgruppene dine\n"
+		+"8: Avslutte programmet";
+		 
+		while(running){
+			System.out.println(mainUI);
+			String input = scanner.nextLine();
+			try {
+				switch(input){
+					case("8"): 
+						System.out.println("Programmet har lagret dataene dine og avslutter.");
+						running = false;
+						break;
+					case("1"): 
+						System.out.println("Registrer ny treningsøkt");
+						//Okt okt = new Okt(conn);
+						//okt.addNyOkt(scanner);
+						//break;
+					case("2"): 
+						System.out.println("Husker du hvilken id okten din hadde? Ja/Nei");
+						//Okt okt = new Okt(Conn);
+						//okt.etterregistrerOvelse(Scanner);
+						//Break;
+					case("3"):
+						System.out.println("Registrer nytt apparat");
+						Apparat apparat = new Apparat(conn);
+						apparat.addApparat(scanner);
+						break;
+					case("4"):
+						System.out.println("Legg til ny øvelsesgruppe");
+						Ovelsesgruppe gruppe = new Ovelsesgruppe(conn);
+						gruppe.addOvelsesgruppe(scanner);
+					case("5"):
+						System.out.println("Hvilken øvelse ønsker du å se resultater for?");
+						String ovelse = scanner.nextLine();
+						System.out.println("Nå skal du velge tidsintervall. Fra hvilken dato ønsker du å se resultater?(YYYY-MM-DD)");
+						String fraDato = scanner.nextLine();
+						System.out.println("Til hvilken dato ønsker du?");
+						String tilDato = scanner.nextLine();
+						String viseResultater = viseResultater(ovelse,fraDato,tilDato);
+						System.out.println(""+viseResultater);
+					case("6"):
+						System.out.println("Hvor mange av de siste øktene dine ønsker du å se?");
+						String antall = scanner.nextLine();
+						String viseOkter = viseOkter(antall);
+						System.out.println(""+viseOkter);
+					case("7"):
+						System.out.println("Hvilken øvelsesgruppe ønsker du å se statistikk for?");
+						String type = scanner.nextLine();
+						String utprint = viseStatistikk(type);
+						System.out.println(""+utprint);
+					}
+				}
+				catch(Exception e) {
+					System.out.println("Det skjedde en feil under inntastingen");
+				}
+					
+			}
+			
+		}
+	
+	public String viseResultater(String ovelse, String fraDato, String tilDato)
+	{
+		String toString = null;
+		try {
+			stmt=conn.createStatement();
+			String query= "SELECT \r\n" +  
+					"    okt.dato,okt.tidspunkt,okt.varighet,okt.informasjon,\r\n" + 
+					"    ovelseprokt.kilo,ovelseprokt.sett,ovelseprokt.reps\r\n" + 
+					"FROM\r\n" + 
+					"	ovelse \r\n" + 
+					"    INNER JOIN ovelseprokt ON ovelse.ovelseId=ovelseprokt.ovelseId\r\n" + 
+					"    INNER JOIN okt ON ovelseprokt.oktId=okt.oktId\r\n" + 
+					"WHERE dato BETWEEN '"+fraDato+"' AND '"+tilDato+"'AND navn='"+ovelse+"'";
+			if(stmt.execute(query))
+			{
+				rs=stmt.getResultSet();
+			}
+			while(rs.next())
+			{
+				String dato=rs.getString(0);
+				String tidspunkt=rs.getString(1);
+				String kilo=rs.getString(2);
+				String reps=rs.getString(3);
+				String sett=rs.getString(4);
+				toString="Dato: "+dato+" Tidspunkt: "+tidspunkt+" Kilo: "+kilo+" Reps: "+reps+" Sett: "+sett;
+			}
+			
+		}
+		catch(SQLException ex) {
+			toString="SQLException: "+ex.getMessage();
+		}
+		return toString;
+	}
+	
+	public String viseOkter(String antall) {
+		String toString = null;
+		int i=0;
+		try {
+			stmt=conn.createStatement();
+			String query="SELECT \r\n" + 
+					"	ovelse.navn\r\n" + 
+					"FROM\r\n" + 
+					"	ovelseprokt\r\n" + 
+					"    INNER JOIN ovelse WHERE ovelse.ovelseId=ovelseprokt.ovelseId\r\n" + 
+					"ORDER BY\r\n" + 
+					"	oktId DESC";
+			if(stmt.execute(query))
+			{
+				rs=stmt.getResultSet();
+			}
+			while(rs.next() && i<=Integer.valueOf(antall))
+			{
+				i++;
+				String ovelse=rs.getString(0);
+				toString=i+". Ovelse: "+ovelse;
+			}
+			
+		}
+		catch(SQLException ex) {
+			toString="SQLException: "+ex.getMessage();
+		}
+		return toString;
+	}
+	
+	public String viseStatistikk(String gruppe)
+	{
+		String toString = null;
+		try {
+			stmt=conn.createStatement();
+			String query="SELECT \r\n" + 
+					"    COUNT(ovelse.ovelsesGruppeId)\r\n" + 
+					"FROM\r\n" + 
+					"	ovelse\r\n" + 
+					"    INNER JOIN ovelseprokt ON ovelse.ovelseId=ovelseprokt.ovelseId\r\n" + 
+					"    INNER JOIN ovelsesgruppe ON ovelse.ovelsesGruppeId=ovelsesgruppe.ovelsesGruppeId\r\n" + 
+					"WHERE ovelsesgruppe.gruppeType='"+gruppe+"'";
+			if(stmt.execute(query))
+			{
+				rs=stmt.getResultSet();
+			}
+			int antall=Integer.valueOf(rs.getString(0));
+			toString="Du har trent "+gruppe+" totalt "+antall+" antall ganger siden du begynte å registrere treningsøkter.";	
+		}
+		catch(SQLException ex) {
+			toString="SQLException: "+ex.getMessage();
+		}
+		return toString;
+	}
+	
+	public static void main(String[] args) {
+       Connection conn = null;
+		try {
+			DagbokUI ui = new DagbokUI();
+			ui.mainUI(conn);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (conn != null){
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+	}
+}
