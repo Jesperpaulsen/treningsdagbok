@@ -1,0 +1,44 @@
+package treningsdagbok;
+import java.sql.*;
+import java.util.Scanner;
+
+
+public class Apparat {
+	//connection
+    private Connection conn;
+
+    //gruppe
+    private String navn, funksjon, beskrivelse;
+    private int apparatId, ovelseId;
+
+    //constructor
+   public Apparat(Connection conn) {
+        this.conn = conn;   
+    }
+    
+    //Getterene
+	public String getNavn() {return navn;}
+	public String getFunksjon() {return funksjon;}
+	public String getBeskrivelse() {return beskrivelse;}
+	public int getApparatId() {return apparatId;}
+    
+	public void addApparat(Scanner scanner) throws SQLException{
+		System.out.println("Legg til nytt apparat\nHva er navnet på apparatet?");
+		this.navn = scanner.nextLine();
+		System.out.println("Hva er funksjonen til "+navn+" ?");
+		this.funksjon=scanner.nextLine();
+		System.out.println("Har du en beskrivelse av apparatet?");
+		this.beskrivelse=scanner.nextLine();
+		System.out.println("Vil du legge til følgende apparat?\nNavn: "+navn+"\nFunksjon: "+funksjon+"\nBeskrivelse: "+beskrivelse+"\nJa/Nei?");
+		String apparatSQL= String.format("INSERT INTO apparat VALUES(%s,%s,%s)",this.navn,this.funksjon,this.beskrivelse);
+		if(scanner.nextLine()=="Ja")
+		{
+			 Statement stmt = conn.createStatement();
+			 stmt.executeUpdate(apparatSQL);
+		}
+		else
+		{
+			System.out.println("Avbrutt, ingenting ble lagt til.");
+		}
+	}
+}
