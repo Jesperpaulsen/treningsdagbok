@@ -184,20 +184,9 @@ public class DagbokUI
 	}
 	
 	public static void main(String[] args) {
-       Connection conn = null;
-		try {
-			DagbokUI ui = new DagbokUI();
-			ui.mainUI(conn);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (conn != null){
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+	Connection conn = null;
+		DagbokUI ui = new DagbokUI();
+		ui.connect();
+		ui.mainUI(conn);
 	}
 }
