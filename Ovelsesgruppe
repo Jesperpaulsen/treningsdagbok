@@ -1,0 +1,40 @@
+package treningsdagbok;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Scanner;
+
+
+public class Ovelsesgruppe 
+{
+	Connection conn;
+	String type;
+	int gruppeId;
+	
+	public Ovelsesgruppe(Connection conn)
+	{
+		this.conn=conn;
+	}
+	
+	public String getGruppeType(){return this.type;}
+	public int getGruppeId(){return this.gruppeId;}
+	
+	public void addOvelsesgruppe(Scanner scanner) throws SQLException
+	{
+		String input = scanner.nextLine();
+		System.out.println("Legg til ny gruppe.\nHvilken type grupe er det?");
+		this.type=input;
+		String gruppeSQL=String.format("INSERT INTO ovelsesgruppe VALUES(%s)",this.type);
+		System.out.println("Vil du legge til følgende øvelsesgruppe?\nType: "+type+"\nJa/Nei?");
+		if(scanner.nextLine()=="Ja")
+		{
+			 Statement stmt = conn.createStatement();
+			 stmt.executeUpdate(gruppeSQL);
+		}
+		else
+		{
+			System.out.println("Avbrutt, ingenting ble lagt til.");
+		}
+	}
+	
+}
