@@ -31,7 +31,7 @@ public class Apparat {
 		this.beskrivelse=scanner.nextLine();
 		System.out.println("Vil du legge til følgende apparat?\nNavn: "+navn+"\nFunksjon: "+funksjon+"\nBeskrivelse: "+beskrivelse+"\nJa/Nei?");
 		String apparatSQL= String.format("INSERT INTO apparat VALUES(%s,%s,%s)",this.navn,this.funksjon,this.beskrivelse);
-		if(scanner.nextLine().toLowerCase()=="ja")
+		if(scanner.nextLine().toLowerCase().equals("ja"))
 		{
 			 Statement stmt = conn.createStatement();
 			 stmt.executeUpdate(apparatSQL);
