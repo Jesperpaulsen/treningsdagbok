@@ -9,7 +9,7 @@ public class Apparat {
 
     //gruppe
     private String navn, funksjon, beskrivelse;
-    private int apparatId, ovelseId;
+    private int apparatId;
 
     //constructor
    public Apparat(Connection conn) {
@@ -23,6 +23,8 @@ public class Apparat {
 	public int getApparatId() {return apparatId;}
     
 	public void addApparat(Scanner scanner) throws SQLException{
+		Statement stmt=null;
+		//ResultSet rs=null;
 		System.out.println("Legg til nytt apparat\nHva er navnet på apparatet?");
 		this.navn = scanner.nextLine();
 		System.out.println("Hva er funksjonen til "+navn+" ?");
@@ -30,11 +32,16 @@ public class Apparat {
 		System.out.println("Har du en beskrivelse av apparatet?");
 		this.beskrivelse=scanner.nextLine();
 		System.out.println("Vil du legge til følgende apparat?\nNavn: "+navn+"\nFunksjon: "+funksjon+"\nBeskrivelse: "+beskrivelse+"\nJa/Nei?");
-		String apparatSQL= String.format("INSERT INTO apparat VALUES(%s,%s,%s)",this.navn,this.funksjon,this.beskrivelse);
+		String apparatSQL= String.format("INSERT INTO apparat(navn,beskrivelse,funksjon) VALUES('%s','%s','%s')",this.navn,this.funksjon,this.beskrivelse);
 		if(scanner.nextLine().toLowerCase().equals("ja"))
 		{
-			 Statement stmt = conn.createStatement();
-			 stmt.executeUpdate(apparatSQL);
+			try {
+				stmt=conn.createStatement();
+				stmt.executeUpdate(apparatSQL);
+			}
+			catch(SQLException ex){
+				System.out.println("SQLException: "+ex.getMessage());
+			}
 		}
 		else
 		{
