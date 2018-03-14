@@ -10,6 +10,7 @@ public class Ovelsesgruppe
 	Connection conn;
 	String type;
 	int gruppeId;
+	Statement stmt;
 	
 	public Ovelsesgruppe(Connection conn)
 	{
@@ -23,12 +24,17 @@ public class Ovelsesgruppe
 	{
 		System.out.println("Hvilken type grupe er det?");
 		this.type=scanner.nextLine();
-		String gruppeSQL=String.format("INSERT INTO ovelsesgruppe VALUES(%s)",this.type);
+		String gruppeSQL=String.format("INSERT INTO ovelsesgruppe(gruppeType) VALUES('%s')",this.type);
 		System.out.println("Vil du legge til følgende øvelsesgruppe?\nType: "+type+"\nJa/Nei?");
 		if(scanner.nextLine().toLowerCase().equals("ja"))
 		{
-			 Statement stmt = conn.createStatement();
-			 stmt.executeUpdate(gruppeSQL);
+			try {
+				stmt=conn.createStatement();
+				stmt.executeUpdate(gruppeSQL);
+			}
+			catch(SQLException ex){
+				System.out.println("SQLException: "+ex.getMessage());
+			}
 		}
 		else
 		{
