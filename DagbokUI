@@ -67,28 +67,18 @@ public class DagbokUI
 						gruppe.addOvelsesgruppe(scanner);
 						break;
 					case("5"):
-						System.out.println("Hvilken øvelse ønsker du å se resultater for?");
-						String ovelse = scanner.nextLine();
-						System.out.println("Nå skal du velge tidsintervall. Fra hvilken dato ønsker du å se resultater?(YYYY-MM-DD)");
-						String fraDato = scanner.nextLine();
-						System.out.println("Til hvilken dato ønsker du?");
-						String tilDato = scanner.nextLine();
 						ViseResultater ovelseResultater = new ViseResultater(conn);
-						String viseResultater = ovelseResultater.toString(ovelse,fraDato,tilDato);
+						String viseResultater = ovelseResultater.toString(scanner);
 						System.out.println(""+viseResultater);
 						break;
 					case("6"):
-						System.out.println("Hvor mange av de siste øktene dine ønsker du å se?");
-						String antall = scanner.nextLine();
 						ViseOkter oversiktOkter=new ViseOkter(conn);
-						String viseOkter = oversiktOkter.toString(antall);
+						String viseOkter = oversiktOkter.toString(scanner);
 						System.out.println(""+viseOkter);
 						break;
 					case("7"):
-						System.out.println("Hvilken øvelsesgruppe ønsker du å se statistikk for?");
-						String type = scanner.nextLine();
 						ViseStatistikk statistikk = new ViseStatistikk(conn);
-						String utprint = statistikk.toString(type);
+						String utprint = statistikk.toString(scanner);
 						System.out.println(""+utprint);
 						break;
 					}
