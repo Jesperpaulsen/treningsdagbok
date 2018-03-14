@@ -1,0 +1,43 @@
+package treningsdagbok;
+
+import java.sql.*;
+
+public class ViseOkter {
+	public Connection conn=null;
+	Statement stmt=null;
+	ResultSet rs=null;
+	public ViseOkter(Connection conn) {
+	        this.conn = conn;   
+	}
+	
+	public String toString(String antall) {
+		String toString = null;
+		int i=0;
+		try {
+			stmt=conn.createStatement();
+			String query="SELECT \r\n" + 
+					"	ovelse.navn\r\n" + 
+					"FROM\r\n" + 
+					"	ovelseprokt\r\n" + 
+					"    INNER JOIN ovelse WHERE ovelse.ovelseId=ovelseprokt.ovelseId\r\n" + 
+					"ORDER BY\r\n" + 
+					"	oktId DESC";
+			if(stmt.execute(query))
+			{
+				rs=stmt.getResultSet();
+			}
+			while(rs.next() && i<=Integer.valueOf(antall))
+			{
+				i++;
+				String ovelse=rs.getString(0);
+				toString=i+". Ovelse: "+ovelse;
+			}
+			
+		}
+		catch(SQLException ex) {
+			toString="SQLException: "+ex.getMessage();
+		}
+		return toString;
+	}
+	
+}
