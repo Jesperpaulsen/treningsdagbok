@@ -1,0 +1,47 @@
+package treningsdagbok;
+
+import java.sql.*;
+
+public class ViseResultater 
+{
+	public Connection conn=null;
+	Statement stmt=null;
+	ResultSet rs=null;
+	public ViseResultater(Connection conn) {
+	        this.conn = conn;   
+	}
+	
+	
+	public String toString(String fraDato, String tilDato, String ovelse){
+	String toString = null;
+	try {
+		stmt=conn.createStatement();
+		String query= "SELECT \r\n" +  
+				"    okt.dato,okt.tidspunkt,okt.varighet,okt.informasjon,\r\n" + 
+				"    ovelseprokt.kilo,ovelseprokt.sett,ovelseprokt.reps\r\n" + 
+				"FROM\r\n" + 
+				"	ovelse \r\n" + 
+				"    INNER JOIN ovelseprokt ON ovelse.ovelseId=ovelseprokt.ovelseId\r\n" + 
+				"    INNER JOIN okt ON ovelseprokt.oktId=okt.oktId\r\n" + 
+				"WHERE dato BETWEEN '"+fraDato+"' AND '"+tilDato+"'AND navn='"+ovelse+"'";
+		if(stmt.execute(query))
+		{
+			rs=stmt.getResultSet();
+		}
+		while(rs.next())
+		{
+			String dato=rs.getString(0);
+			String tidspunkt=rs.getString(1);
+			String kilo=rs.getString(2);
+			String reps=rs.getString(3);
+			String sett=rs.getString(4);
+			toString="Dato: "+dato+" Tidspunkt: "+tidspunkt+" Kilo: "+kilo+" Reps: "+reps+" Sett: "+sett;
+		}
+		
+	}
+	catch(SQLException ex) {
+		toString="SQLException: "+ex.getMessage();
+	}
+	return toString;
+}
+}
