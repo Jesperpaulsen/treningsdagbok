@@ -16,7 +16,7 @@ public class DagbokUI
 	public void connect()
 	{
 		try {
-			conn=DriverManager.getConnection("jdbc:mysql://localhost:3306/treningsdagbok?user=root&password=password");
+			conn=DriverManager.getConnection("jdbc:mysql://localhost:3306/prosjektoppgave?user=root&password=password");
 		}
 		catch(SQLException ex){
 			System.out.println("SQLException: "+ex.getMessage());
@@ -55,7 +55,7 @@ public class DagbokUI
 						System.out.println("Husker du hvilken id okten din hadde? Ja/Nei");
 						//Okt okt = new Okt(Conn);
 						//okt.etterregistrerOvelse(Scanner);
-						//Break;
+						//break;
 					case("3"):
 						System.out.println("Registrer nytt apparat");
 						Apparat apparat = new Apparat(conn);
@@ -65,6 +65,7 @@ public class DagbokUI
 						System.out.println("Legg til ny øvelsesgruppe");
 						Ovelsesgruppe gruppe = new Ovelsesgruppe(conn);
 						gruppe.addOvelsesgruppe(scanner);
+						break;
 					case("5"):
 						System.out.println("Hvilken øvelse ønsker du å se resultater for?");
 						String ovelse = scanner.nextLine();
@@ -72,18 +73,24 @@ public class DagbokUI
 						String fraDato = scanner.nextLine();
 						System.out.println("Til hvilken dato ønsker du?");
 						String tilDato = scanner.nextLine();
-						String viseResultater = viseResultater(ovelse,fraDato,tilDato);
+						ViseResultater ovelseResultater = new ViseResultater(conn);
+						String viseResultater = ovelseResultater.toString(ovelse,fraDato,tilDato);
 						System.out.println(""+viseResultater);
+						break;
 					case("6"):
 						System.out.println("Hvor mange av de siste øktene dine ønsker du å se?");
 						String antall = scanner.nextLine();
-						String viseOkter = viseOkter(antall);
+						ViseOkter oversiktOkter=new ViseOkter(conn);
+						String viseOkter = oversiktOkter.toString(antall);
 						System.out.println(""+viseOkter);
+						break;
 					case("7"):
 						System.out.println("Hvilken øvelsesgruppe ønsker du å se statistikk for?");
 						String type = scanner.nextLine();
-						String utprint = viseStatistikk(type);
+						ViseStatistikk statistikk = new ViseStatistikk(conn);
+						String utprint = statistikk.toString(type);
 						System.out.println(""+utprint);
+						break;
 					}
 				}
 				catch(Exception e) {
@@ -94,97 +101,8 @@ public class DagbokUI
 			
 		}
 	
-	public String viseResultater(String ovelse, String fraDato, String tilDato)
-	{
-		String toString = null;
-		try {
-			stmt=conn.createStatement();
-			String query= "SELECT \r\n" +  
-					"    okt.dato,okt.tidspunkt,okt.varighet,okt.informasjon,\r\n" + 
-					"    ovelseprokt.kilo,ovelseprokt.sett,ovelseprokt.reps\r\n" + 
-					"FROM\r\n" + 
-					"	ovelse \r\n" + 
-					"    INNER JOIN ovelseprokt ON ovelse.ovelseId=ovelseprokt.ovelseId\r\n" + 
-					"    INNER JOIN okt ON ovelseprokt.oktId=okt.oktId\r\n" + 
-					"WHERE dato BETWEEN '"+fraDato+"' AND '"+tilDato+"'AND navn='"+ovelse+"'";
-			if(stmt.execute(query))
-			{
-				rs=stmt.getResultSet();
-			}
-			while(rs.next())
-			{
-				String dato=rs.getString(0);
-				String tidspunkt=rs.getString(1);
-				String kilo=rs.getString(2);
-				String reps=rs.getString(3);
-				String sett=rs.getString(4);
-				toString="Dato: "+dato+" Tidspunkt: "+tidspunkt+" Kilo: "+kilo+" Reps: "+reps+" Sett: "+sett;
-			}
-			
-		}
-		catch(SQLException ex) {
-			toString="SQLException: "+ex.getMessage();
-		}
-		return toString;
-	}
-	
-	public String viseOkter(String antall) {
-		String toString = null;
-		int i=0;
-		try {
-			stmt=conn.createStatement();
-			String query="SELECT \r\n" + 
-					"	ovelse.navn\r\n" + 
-					"FROM\r\n" + 
-					"	ovelseprokt\r\n" + 
-					"    INNER JOIN ovelse WHERE ovelse.ovelseId=ovelseprokt.ovelseId\r\n" + 
-					"ORDER BY\r\n" + 
-					"	oktId DESC";
-			if(stmt.execute(query))
-			{
-				rs=stmt.getResultSet();
-			}
-			while(rs.next() && i<=Integer.valueOf(antall))
-			{
-				i++;
-				String ovelse=rs.getString(0);
-				toString=i+". Ovelse: "+ovelse;
-			}
-			
-		}
-		catch(SQLException ex) {
-			toString="SQLException: "+ex.getMessage();
-		}
-		return toString;
-	}
-	
-	public String viseStatistikk(String gruppe)
-	{
-		String toString = null;
-		try {
-			stmt=conn.createStatement();
-			String query="SELECT \r\n" + 
-					"    COUNT(ovelse.ovelsesGruppeId)\r\n" + 
-					"FROM\r\n" + 
-					"	ovelse\r\n" + 
-					"    INNER JOIN ovelseprokt ON ovelse.ovelseId=ovelseprokt.ovelseId\r\n" + 
-					"    INNER JOIN ovelsesgruppe ON ovelse.ovelsesGruppeId=ovelsesgruppe.ovelsesGruppeId\r\n" + 
-					"WHERE ovelsesgruppe.gruppeType='"+gruppe+"'";
-			if(stmt.execute(query))
-			{
-				rs=stmt.getResultSet();
-			}
-			int antall=Integer.valueOf(rs.getString(0));
-			toString="Du har trent "+gruppe+" totalt "+antall+" antall ganger siden du begynte å registrere treningsøkter.";	
-		}
-		catch(SQLException ex) {
-			toString="SQLException: "+ex.getMessage();
-		}
-		return toString;
-	}
-	
 	public static void main(String[] args) {
-	Connection conn = null;
+		Connection conn = null;
 		DagbokUI ui = new DagbokUI();
 		ui.connect();
 		ui.mainUI(conn);
