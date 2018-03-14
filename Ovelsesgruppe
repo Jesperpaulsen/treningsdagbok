@@ -21,12 +21,11 @@ public class Ovelsesgruppe
 	
 	public void addOvelsesgruppe(Scanner scanner) throws SQLException
 	{
-		String input = scanner.nextLine();
-		System.out.println("Legg til ny gruppe.\nHvilken type grupe er det?");
-		this.type=input;
+		System.out.println("Hvilken type grupe er det?");
+		this.type=scanner.nextLine();
 		String gruppeSQL=String.format("INSERT INTO ovelsesgruppe VALUES(%s)",this.type);
 		System.out.println("Vil du legge til følgende øvelsesgruppe?\nType: "+type+"\nJa/Nei?");
-		if(scanner.nextLine()=="Ja")
+		if(scanner.nextLine().toLowerCase().equals("ja"))
 		{
 			 Statement stmt = conn.createStatement();
 			 stmt.executeUpdate(gruppeSQL);
