@@ -9,21 +9,21 @@ import java.util.Scanner;
 
 public class DagbokUI 
 {
-	public Connection conn=null;
+	public static Connection conn=null;
 	Statement stmt=null;
 	ResultSet rs=null;
 	
 	public void connect()
 	{
 		try {
-			conn=DriverManager.getConnection("jdbc:mysql://localhost:3306/prosjektoppgave?user=root&password=password");
+			DagbokUI.conn=DriverManager.getConnection("jdbc:mysql://localhost:3306/prosjektoppgave?user=root&password=password");
 		}
 		catch(SQLException ex){
 			System.out.println("SQLException: "+ex.getMessage());
 		}
 	}
 	
-	public void mainUI(Connection conn) {
+	public void mainUI(Connection conn) throws SQLException{
 		Scanner scanner = new Scanner(System.in);
 		boolean running=true;
 		
@@ -84,6 +84,7 @@ public class DagbokUI
 					}
 				}
 				catch(Exception e) {
+					System.out.println(""+e);
 					System.out.println("Det skjedde en feil under inntastingen");
 				}
 					
@@ -91,8 +92,7 @@ public class DagbokUI
 			
 		}
 	
-	public static void main(String[] args) {
-		Connection conn = null;
+	public static void main(String[] args) throws SQLException {
 		DagbokUI ui = new DagbokUI();
 		ui.connect();
 		ui.mainUI(conn);
