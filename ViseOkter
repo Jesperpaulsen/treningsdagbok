@@ -1,6 +1,10 @@
 package treningsdagbok;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Scanner;
 
 public class ViseOkter {
 	public Connection conn=null;
@@ -10,8 +14,10 @@ public class ViseOkter {
 	        this.conn = conn;   
 	}
 	
-	public String toString(String antall) {
+	public String toString(Scanner scanner) {
 		String toString = null;
+		System.out.println("Hvor mange av de siste øktene dine ønsker du å se?");
+		String antall = scanner.nextLine();
 		int i=0;
 		try {
 			stmt=conn.createStatement();
@@ -26,16 +32,16 @@ public class ViseOkter {
 			{
 				rs=stmt.getResultSet();
 			}
-			while(rs.next() && i<=Integer.valueOf(antall))
+			while(rs.next() && i<Integer.valueOf(antall))
 			{
 				i++;
-				String ovelse=rs.getString(0);
-				toString=i+". Ovelse: "+ovelse;
+				String ovelse=rs.getString(1);
+				toString=i+". Øvelse: "+ovelse;
 			}
 			
 		}
 		catch(SQLException ex) {
-			toString="SQLException: "+ex.getMessage();
+			return "SQLException: "+ex.getMessage();
 		}
 		return toString;
 	}
