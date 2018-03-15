@@ -7,37 +7,40 @@ import java.sql.Statement;
 import java.util.Scanner;
 
 public class ViseStatistikk {
-	public Connection conn=null;
-	Statement stmt=null;
-	ResultSet rs=null;
+	public Connection conn = null;
+	Statement stmt = null;
+	ResultSet rs = null;
+
 	public ViseStatistikk(Connection conn) {
-	        this.conn = conn;   
+		this.conn = conn;
 	}
-	
-	public String toString(Scanner scanner)
-	{
+
+	public void toString(Scanner scanner) {
 		System.out.println("Hvilken øvelsesgruppe ønsker du å se statistikk for?");
 		String type = scanner.nextLine();
-		String toString = null;
 		try {
-			stmt=conn.createStatement();
-			String query="SELECT \r\n" + 
-					"    COUNT(ovelse.ovelsesGruppeId)\r\n" + 
-					"FROM\r\n" + 
-					"	ovelse\r\n" + 
-					"    INNER JOIN ovelseprokt ON ovelse.ovelseId=ovelseprokt.ovelseId\r\n" + 
-					"    INNER JOIN ovelsesgruppe ON ovelse.ovelsesGruppeId=ovelsesgruppe.ovelsesGruppeId\r\n" + 
-					"WHERE ovelsesgruppe.gruppeType='"+type.toLowerCase()+"'";
-			if(stmt.execute(query))
-			{
-				rs=stmt.getResultSet();
+			stmt = conn.createStatement();
+			String query = "SELECT \r\n" + "    COUNT(ovelse.ovelsesGruppeId) AS count \r\n" + "FROM\r\n"
+					+ "	ovelse\r\n" + "    INNER JOIN ovelseprokt ON ovelse.ovelseId=ovelseprokt.ovelseId\r\n"
+					+ "    INNER JOIN ovelsesgruppe ON ovelse.ovelsesGruppeId=ovelsesgruppe.ovelsesGruppeId\r\n"
+					+ "WHERE ovelsesgruppe.gruppeType='" + type + "'";
+			System.out.println("test1");
+			if (stmt.execute(query)) {
+				rs = stmt.getResultSet();
+				System.out.println("test2");
 			}
-			int antall=Integer.valueOf(rs.getString(1));
-			toString="Du har trent "+type+" totalt "+antall+" antall ganger siden du begynte å registrere treningsøkter.";	
+			// int antall=Integer.valueOf(rs.getString(1));
+			System.out.println("Test3");
+			while (rs.next()) {
+			int antall = rs.getInt("count");
+			// int antall = rs.getInt(1);
+			System.out.println(
+					"Du har trent " +type+ " totalt " +antall+ " antall ganger siden du begynte å registrere treningsøkter");
+			System.out.println("test4");
+			}
+		} catch (SQLException ex) {
+			System.out.println("SQLException: " + ex.getMessage());
 		}
-		catch(SQLException ex) {
-			toString="SQLException: "+ex.getMessage();
-		}
-		return toString;
+
 	}
 }
