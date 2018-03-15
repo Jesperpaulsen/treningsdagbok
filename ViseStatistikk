@@ -1,6 +1,10 @@
 package treningsdagbok;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Scanner;
 
 public class ViseStatistikk {
 	public Connection conn=null;
@@ -10,8 +14,10 @@ public class ViseStatistikk {
 	        this.conn = conn;   
 	}
 	
-	public String toString(String gruppe)
+	public String toString(Scanner scanner)
 	{
+		System.out.println("Hvilken øvelsesgruppe ønsker du å se statistikk for?");
+		String type = scanner.nextLine();
 		String toString = null;
 		try {
 			stmt=conn.createStatement();
@@ -21,13 +27,13 @@ public class ViseStatistikk {
 					"	ovelse\r\n" + 
 					"    INNER JOIN ovelseprokt ON ovelse.ovelseId=ovelseprokt.ovelseId\r\n" + 
 					"    INNER JOIN ovelsesgruppe ON ovelse.ovelsesGruppeId=ovelsesgruppe.ovelsesGruppeId\r\n" + 
-					"WHERE ovelsesgruppe.gruppeType='"+gruppe.toLowerCase()+"'";
+					"WHERE ovelsesgruppe.gruppeType='"+type.toLowerCase()+"'";
 			if(stmt.execute(query))
 			{
 				rs=stmt.getResultSet();
 			}
-			int antall=Integer.valueOf(rs.getString(0));
-			toString="Du har trent "+gruppe+" totalt "+antall+" antall ganger siden du begynte å registrere treningsøkter.";	
+			int antall=Integer.valueOf(rs.getString(1));
+			toString="Du har trent "+type+" totalt "+antall+" antall ganger siden du begynte å registrere treningsøkter.";	
 		}
 		catch(SQLException ex) {
 			toString="SQLException: "+ex.getMessage();
