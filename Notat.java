@@ -7,7 +7,7 @@ public class Notat {
 
 	private Connection conn;
 	private String formal;
-	private int oktId;
+	private String oktId;
 	private String opplevelse;
 
 	public Notat(Connection conn, int oktId) {
@@ -18,7 +18,7 @@ public class Notat {
 		return formal;
 	}
 
-	public int getOktId() {
+	public String getOktId() {
 		return oktId;
 	}
 
@@ -27,30 +27,30 @@ public class Notat {
 	}
 
 	public void addNotat(Scanner scanner) throws SQLException {
-		this.oktId = getOktIdFromDB(conn);
+		oktId = getOktIdFromDB(conn);
 		System.out.println("Formalet med okten?");
 		formal = scanner.nextLine();
 		System.out.println("Opplevelsen av okten?");
 		opplevelse = scanner.nextLine();
 
-		String notatSql = String.format("INSERT INTO notat('%d','%s','%s')", getOktId(), getFormal(), getOpplevelse());
+		String notatSql = String.format("INSERT INTO notat VALUES('%s','%s','%s')", getOktId(), getFormal(), getOpplevelse());
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate(notatSql);
 
 	}
 
-	public int getOktIdFromDB(Connection conn) {
-		String query = "SELECT oktID FROM treningsokt ORDER BY oktID DESC LIMIT 1";
+	public String getOktIdFromDB(Connection conn) {
+		String query = "SELECT oktId FROM okt ORDER BY oktID DESC LIMIT 1";
 		try {
 			ResultSet rs = getResultSet(conn, query);
 			if (rs.next()) {
-				int øktID = rs.getInt("øktID");
-				return øktID;
+				this.oktId = rs.getString("oktId");
+				return oktId;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return 0;
+		return null;
 	}
 
 	private static ResultSet getResultSet(Connection conn, String query) throws SQLException {
