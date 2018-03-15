@@ -1,6 +1,10 @@
 package treningsdagbok;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Scanner;
 
 public class ViseResultater 
 {
@@ -12,8 +16,14 @@ public class ViseResultater
 	}
 	
 	
-	public String toString(String fraDato, String tilDato, String ovelse){
+	public String toString(Scanner scanner){
 	String toString = null;
+	System.out.println("Hvilken øvelse ønsker du å se resultater for?");
+	String ovelse = scanner.nextLine();
+	System.out.println("Nå skal du velge tidsintervall. Fra hvilken dato ønsker du å se resultater?(YYYY-MM-DD)");
+	String fraDato = scanner.nextLine();
+	System.out.println("Til hvilken dato ønsker du?");
+	String tilDato = scanner.nextLine();
 	try {
 		stmt=conn.createStatement();
 		String query= "SELECT \r\n" +  
@@ -30,17 +40,21 @@ public class ViseResultater
 		}
 		while(rs.next())
 		{
-			String dato=rs.getString(0);
-			String tidspunkt=rs.getString(1);
-			String kilo=rs.getString(2);
-			String reps=rs.getString(3);
-			String sett=rs.getString(4);
+			String dato=rs.getString(1);
+			String tidspunkt=rs.getString(2);
+			String kilo=rs.getString(3);
+			String reps=rs.getString(4);
+			String sett=rs.getString(5);
 			toString="Dato: "+dato+" Tidspunkt: "+tidspunkt+" Kilo: "+kilo+" Reps: "+reps+" Sett: "+sett;
+			if(toString.equals("null"))
+			{
+				toString="Fant ingen treningsøkter i dette tidsintervallet.";
+			}
 		}
 		
 	}
 	catch(SQLException ex) {
-		toString="SQLException: "+ex.getMessage();
+		return "SQLException: "+ex.getMessage();
 	}
 	return toString;
 }
