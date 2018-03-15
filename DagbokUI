@@ -7,91 +7,79 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
 
-public class DagbokUI 
-{
-	public static Connection conn=null;
-	Statement stmt=null;
-	ResultSet rs=null;
-	
-	public void connect()
-	{
+public class DagbokUI {
+	public static Connection conn = null;
+	Statement stmt = null;
+	ResultSet rs = null;
+
+	public void connect() {
 		try {
-			DagbokUI.conn=DriverManager.getConnection("jdbc:mysql://localhost:3306/prosjektoppgave?user=root&password=password");
-		}
-		catch(SQLException ex){
-			System.out.println("SQLException: "+ex.getMessage());
+			DagbokUI.conn = DriverManager
+					.getConnection("jdbc:mysql://localhost:3306/Treningsdagbok?user=root&password=Leon1ermingud");
+		} catch (SQLException ex) {
+			System.out.println("SQLException: " + ex.getMessage());
 		}
 	}
-	
-	public void mainUI(Connection conn) throws SQLException{
+
+	public void mainUI(Connection conn) throws SQLException {
 		Scanner scanner = new Scanner(System.in);
-		boolean running=true;
-		
-		String mainUI="Velkommen til treningsdagboken din! Hva ønsker du å gjøre?\n"
-		+"1: Registrere treningsøkt\n"
-		+"2: Etterregistrere øvelse til en treningsøkt\n"
-		+"3: Registrere apparat\n"
-		+"4: Lage ny øvelsesgruppe\n"
-		+"5: Se resultatlogg for en øvelse\n"
-		+"6: Se info om siste gjennomførte treningsøkter\n"
-		+"7: Statistikk om øvelsesgruppene dine\n"
-		+"8: Avslutte programmet";
-		 
-		while(running){
+		boolean running = true;
+
+		String mainUI = "Velkommen til treningsdagboken din! Hva ønsker du å gjøre?\n" + "1: Registrere treningsøkt\n"
+				+ "2: Etterregistrere øvelse til en treningsøkt\n" + "3: Registrere apparat\n"
+				+ "4: Lage ny øvelsesgruppe\n" + "5: Se resultatlogg for en øvelse\n"
+				+ "6: Se info om siste gjennomførte treningsøkter\n" + "7: Statistikk om øvelsesgruppene dine\n"
+				+ "8: Avslutte programmet";
+
+		while (running) {
 			System.out.println(mainUI);
 			String input = scanner.nextLine();
 			try {
-				switch(input){
-					case("8"): 
-						System.out.println("Programmet har lagret dataene dine og avslutter.");
-						running = false;
-						break;
-					case("1"): 
-						System.out.println("Registrer ny treningsøkt");
-						//Okt okt = new Okt(conn);
-						//okt.addNyOkt(scanner);
-						//break;
-					case("2"): 
-						System.out.println("Husker du hvilken id okten din hadde? Ja/Nei");
-						//Okt okt = new Okt(Conn);
-						//okt.etterregistrerOvelse(Scanner);
-						//break;
-					case("3"):
-						System.out.println("Registrer nytt apparat");
-						Apparat apparat = new Apparat(conn);
-						apparat.addApparat(scanner);
-						break;
-					case("4"):
-						System.out.println("Legg til ny øvelsesgruppe");
-						Ovelsesgruppe gruppe = new Ovelsesgruppe(conn);
-						gruppe.addOvelsesgruppe(scanner);
-						break;
-					case("5"):
-						ViseResultater ovelseResultater = new ViseResultater(conn);
-						String viseResultater = ovelseResultater.toString(scanner);
-						System.out.println(""+viseResultater);
-						break;
-					case("6"):
-						ViseOkter oversiktOkter=new ViseOkter(conn);
-						String viseOkter = oversiktOkter.toString(scanner);
-						System.out.println(""+viseOkter);
-						break;
-					case("7"):
-						ViseStatistikk statistikk = new ViseStatistikk(conn);
-						String utprint = statistikk.toString(scanner);
-						System.out.println(""+utprint);
-						break;
-					}
+				switch (input) {
+				case ("8"):
+					System.out.println("Programmet har lagret dataene dine og avslutter.");
+					running = false;
+					break;
+				case ("1"):
+					System.out.println("Registrer ny treningsøkt");
+					Okt okt = new Okt(conn);
+					okt.addOkt(scanner);
+					break;
+				case ("2"):
+					System.out.println("Husker du hvilken id okten din hadde? Ja/Nei");
+					break;
+				case ("3"):
+					System.out.println("Registrer nytt apparat");
+					Apparat apparat = new Apparat(conn);
+					apparat.addApparat(scanner);
+					break;
+				case ("4"):
+					System.out.println("Legg til ny øvelsesgruppe");
+					Ovelsesgruppe gruppe = new Ovelsesgruppe(conn);
+					gruppe.addOvelsesgruppe(scanner);
+					break;
+				case ("5"):
+					ViseResultater ovelseResultater = new ViseResultater(conn);
+					ovelseResultater.toString(scanner);
+					break;
+				case ("6"):
+					ViseOkter oversiktOkter = new ViseOkter(conn);
+					oversiktOkter.toString(scanner);
+					break;
+				case ("7"):
+					ViseStatistikk statistikk = new ViseStatistikk(conn);
+					statistikk.toString(scanner);
+					break;
 				}
-				catch(Exception e) {
-					System.out.println(""+e);
-					System.out.println("Det skjedde en feil under inntastingen");
-				}
-					
+			} catch (Exception e) {
+				System.out.println("" + e);
+				System.out.println("Det skjedde en feil under inntastingen");
 			}
-			
+
 		}
-	
+
+	}
+
 	public static void main(String[] args) throws SQLException {
 		DagbokUI ui = new DagbokUI();
 		ui.connect();
