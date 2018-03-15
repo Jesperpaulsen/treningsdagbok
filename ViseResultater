@@ -6,56 +6,51 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
 
-public class ViseResultater 
-{
-	public Connection conn=null;
-	Statement stmt=null;
-	ResultSet rs=null;
+public class ViseResultater {
+	public Connection conn = null;
+	Statement stmt = null;
+	ResultSet rs = null;
+
 	public ViseResultater(Connection conn) {
-	        this.conn = conn;   
+		this.conn = conn;
 	}
-	
-	
-	public String toString(Scanner scanner){
-	String toString = null;
-	System.out.println("Hvilken øvelse ønsker du å se resultater for?");
-	String ovelse = scanner.nextLine();
-	System.out.println("Nå skal du velge tidsintervall. Fra hvilken dato ønsker du å se resultater?(YYYY-MM-DD)");
-	String fraDato = scanner.nextLine();
-	System.out.println("Til hvilken dato ønsker du?");
-	String tilDato = scanner.nextLine();
-	try {
-		stmt=conn.createStatement();
-		String query= "SELECT \r\n" +  
-				"    okt.dato,okt.tidspunkt,okt.varighet,okt.informasjon,\r\n" + 
-				"    ovelseprokt.kilo,ovelseprokt.sett,ovelseprokt.reps\r\n" + 
-				"FROM\r\n" + 
-				"	ovelse \r\n" + 
-				"    INNER JOIN ovelseprokt ON ovelse.ovelseId=ovelseprokt.ovelseId\r\n" + 
-				"    INNER JOIN okt ON ovelseprokt.oktId=okt.oktId\r\n" + 
-				"WHERE dato BETWEEN '"+fraDato+"' AND '"+tilDato+"'AND navn='"+ovelse+"'";
-		if(stmt.execute(query))
-		{
-			rs=stmt.getResultSet();
-		}
-		while(rs.next())
-		{
-			String dato=rs.getString(1);
-			String tidspunkt=rs.getString(2);
-			String kilo=rs.getString(3);
-			String reps=rs.getString(4);
-			String sett=rs.getString(5);
-			toString="Dato: "+dato+" Tidspunkt: "+tidspunkt+" Kilo: "+kilo+" Reps: "+reps+" Sett: "+sett;
-			if(toString.equals("null"))
-			{
-				toString="Fant ingen treningsøkter i dette tidsintervallet.";
+
+	public String toString(Scanner scanner) {
+		String toString = null;
+		System.out.println("Hvilken øvelse ønsker du å se resultater for?");
+		String ovelse = scanner.nextLine();
+		System.out.println("Nå skal du velge tidsintervall. Fra hvilken dato ønsker du å se resultater?(YYYY-MM-DD)");
+		String fraDato = scanner.nextLine();
+		System.out.println("Til hvilken dato ønsker du?");
+		String tilDato = scanner.nextLine();
+		try {
+			stmt = conn.createStatement();
+			String query = "SELECT \r\n" + "    okt.dato,okt.tidspunkt,okt.varighet,okt.informasjon,\r\n"
+					+ "    ovelseprokt.kilo,ovelseprokt.sett,ovelseprokt.reps\r\n" + "FROM\r\n" + "	ovelse \r\n"
+					+ "    INNER JOIN ovelseprokt ON ovelse.ovelseId=ovelseprokt.ovelseId\r\n"
+					+ "    INNER JOIN okt ON ovelseprokt.oktId=okt.oktId\r\n" + "WHERE dato BETWEEN '" + fraDato
+					+ "' AND '" + tilDato + "'AND navn='" + ovelse + "'";
+			if (stmt.execute(query)) {
+				rs = stmt.getResultSet();
 			}
+			while (rs.next()) {
+				
+				String dato = rs.getString(1);
+				String tidspunkt = rs.getString(2);
+				String kilo = rs.getString(5);
+				String reps = rs.getString(6);
+				String sett = rs.getString(7);
+				toString = "Dato: " + dato + " Tidspunkt: " + tidspunkt + " Kilo: " + kilo + " Sett: " + reps
+						+ " Reps: " + sett;
+				if (toString.equals("null")) {
+					toString = "Fant ingen treningsøkter i dette tidsintervallet.";
+				}
+				System.out.println(toString);
+			}
+
+		} catch (SQLException ex) {
+			return "SQLException: " + ex.getMessage();
 		}
-		
+		return "";
 	}
-	catch(SQLException ex) {
-		return "SQLException: "+ex.getMessage();
-	}
-	return toString;
-}
 }
