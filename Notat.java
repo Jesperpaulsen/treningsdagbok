@@ -10,7 +10,7 @@ public class Notat {
 	private int oktId;
 	private String opplevelse;
 
-	public Notat(Connection conn) {
+	public Notat(Connection conn, int oktId) {
 		this.conn = conn;
 	}
 
@@ -27,13 +27,13 @@ public class Notat {
 	}
 
 	public void addNotat(Scanner scanner) throws SQLException {
-		// this.oktId=getOktIdFromDB(conn);
+		this.oktId = getOktIdFromDB(conn);
 		System.out.println("Formalet med okten?");
 		formal = scanner.nextLine();
 		System.out.println("Opplevelsen av okten?");
 		opplevelse = scanner.nextLine();
 
-		String notatSql = String.format("INSERT INTO notat(%d,'%s','%s')", getOktId(), getFormal(), getOpplevelse());
+		String notatSql = String.format("INSERT INTO notat('%d','%s','%s')", getOktId(), getFormal(), getOpplevelse());
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate(notatSql);
 
