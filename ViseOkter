@@ -7,43 +7,36 @@ import java.sql.Statement;
 import java.util.Scanner;
 
 public class ViseOkter {
-	public Connection conn=null;
-	Statement stmt=null;
-	ResultSet rs=null;
+	public Connection conn = null;
+	Statement stmt = null;
+	ResultSet rs = null;
+
 	public ViseOkter(Connection conn) {
-	        this.conn = conn;   
+		this.conn = conn;
 	}
-	
-	public String toString(Scanner scanner) {
-		String toString = null;
+
+	public void toString(Scanner scanner) {
 		System.out.println("Hvor mange av de siste øktene dine ønsker du å se?");
 		String antall = scanner.nextLine();
-		int i=0;
+		int i = 0;
 		try {
-			stmt=conn.createStatement();
-			String query="SELECT \r\n" + 
-					"	ovelse.navn\r\n" + 
-					"FROM\r\n" + 
-					"	ovelseprokt\r\n" + 
-					"    INNER JOIN ovelse WHERE ovelse.ovelseId=ovelseprokt.ovelseId\r\n" + 
-					"ORDER BY\r\n" + 
-					"	oktId DESC";
-			if(stmt.execute(query))
-			{
-				rs=stmt.getResultSet();
+			stmt = conn.createStatement();
+			String query = "SELECT \r\n" + "	ovelse.navn\r\n" + "FROM\r\n" + " ovelseprokt\r\n"
+					+ "    INNER JOIN ovelse WHERE ovelse.ovelseId=ovelseprokt.ovelseId\r\n" + "ORDER BY\r\n"
+					+ "	oktId DESC";
+			if (stmt.execute(query)) {
+				rs = stmt.getResultSet();
 			}
-			while(rs.next() && i<Integer.valueOf(antall))
-			{
+			while (rs.next() && i < Integer.valueOf(antall)) {
 				i++;
-				String ovelse=rs.getString(1);
-				toString=i+". Øvelse: "+ovelse;
+				String ovelse = rs.getString(1);
+				System.out.println("Øvelse: " + ovelse);
 			}
-			
+
+		} catch (SQLException ex) {
+
 		}
-		catch(SQLException ex) {
-			return "SQLException: "+ex.getMessage();
-		}
-		return toString;
+
 	}
-	
+
 }
