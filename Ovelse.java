@@ -1,4 +1,4 @@
-package treningsdagbok;
+	package treningsdagbok;
 
 import java.sql.*;
 import java.util.Scanner;
@@ -8,14 +8,13 @@ public class Ovelse {
 	 private Statement stmt=null;
 	 private ResultSet rs=null;
 	 
-	 private String navn, type, beskrivelse,ovelseId, oktId,gruppeId;
-	 private int apparatId,reps, sett, kilo;
+	 private String navn, type, beskrivelse,ovelseId;//,gruppeId;
+	 private int apparatId,reps, sett, kilo, oktId;
 	 
 	 //Konstruktør
-	 public Ovelse(Connection conn,String gruppeId)
+	 public Ovelse(Connection conn)
 	 {
 		 this.conn=conn;
-		 this.gruppeId=gruppeId;
 	 }
 	 
 	 //Gettere
@@ -23,55 +22,67 @@ public class Ovelse {
 	 public String getType(){return this.type;}
 	 public String getBeskrivelse() {return this.beskrivelse;}
 	 public String getOvelseId() {return this.ovelseId;}
-	 public String getOktId() {return this.oktId;}
+	 public int getOktId() {return this.oktId;}
 	 public int getApparatId() {return this.apparatId;}
 	 public int getReps() {return this.reps;}
 	 public int getSett() {return this.sett;}
 	 public int getKilo() {return this.kilo;}
-	 
-	 public void addOvelseIOkt(Scanner scanner,String oktId) throws SQLException
+	 //Legger til ny øvelse i økt
+	 public void addOvelseIOkt(Connection conn,Scanner scanner,int oktId) throws SQLException
 	 {
 		 System.out.println("Hvilken øvelse ønsker du å legge til?");
 		 navn=scanner.nextLine();
-		 if(doesOvelseExist(navn))
+		 System.out.println(""+navn);
+		 this.oktId=oktId;
+		 if(doesOvelseExist(conn,navn))
 		 {
-			 System.out.println("Hvor mange sett tok du?");
-			 String sett = scanner.nextLine();
-			 System.out.println("Hvor mange reps tok du?");
-			 String reps = scanner.nextLine();
-			 System.out.println("Hvor mange kilo tok du?");
-			 String kilo = scanner.nextLine();
-			 String ovelseId=getOldOvelseId(conn,navn);
-			 String ovelseIOktQuerry=String.format("INSERT INTO ovelseprokt VALUES('%s','%s','%s','%s','%s'",oktId,ovelseId,sett,reps,kilo);
-			 insertQuerry(conn,ovelseIOktQuerry);
+			 addSettRepsKilo(conn,navn,scanner,oktId);
 		 }
 		 else
 		 {
-			 addOvelse(scanner,navn);
+			 addOvelse(conn,scanner,navn);
 		 }
 
 	 }
-	 
-	 public boolean doesOvelseExist(String navn)
+	 //Legger til sett,reps,kilo
+	 public void addSettRepsKilo(Connection conn,String navn, Scanner scanner,int oktId)
+	 {
+		 System.out.println("Hvor mange sett tok du?");
+		 String sett = scanner.nextLine();
+		 System.out.println("Hvor mange reps tok du?");
+		 String reps = scanner.nextLine();
+		 System.out.println("Hvor mange kilo tok du?");
+		 String kilo = scanner.nextLine();
+		 String ovelseId=getOldOvelseId(conn,navn);
+		 String ovelseIOktQuerry=String.format("INSERT INTO ovelseprokt VALUES('%d','%s','%s','%s','%s'",oktId,ovelseId,sett,reps,kilo);
+		 insertQuerry(conn,ovelseIOktQuerry);
+	 }
+	 //Sjekker om øvelsen eksisterer
+	 public boolean doesOvelseExist(Connection conn,String navn)
 	 {
 		 String SQLquerryExists="SELECT \r\n" + 
-			 		"	navn\r\n" + 
-			 		"FROM\r\n" + 
-			 		"	ovelse\r\n" + 
-			 		"WHERE EXISTS\r\n" + 
-			 		"	(SELECT navn FROM ovelse WHERE navn='"+navn+"';";
+						 		"	navn\r\n" + 
+						 		"FROM\r\n" + 
+						 		"	ovelse\r\n" + 
+						 		"WHERE EXISTS\r\n" + 
+						 		"	(SELECT navn FROM ovelse WHERE navn='"+navn+"');";
 		 try {
 				stmt=conn.createStatement();
 				if(stmt.execute(SQLquerryExists)){rs=stmt.getResultSet();}
-				if(rs.getString(1).equals("true") ){return true;}	
+				/*while(rs.next())
+				{
+					String kolonne1=rs.getString(1);
+					System.out.println(kolonne1+"");
+				}*/
+				if(rs.next()){return true;}	
 			}
 			catch(SQLException ex) {
 				System.out.println("SQLException: "+ex.getMessage());
 			}
 		 return false;
 	 }
-	 
-	 public boolean doesOvelseGruppeExist(String navn)
+	 //Sjekker om øvelsesgruppen eksisterer
+	 public boolean doesOvelseGruppeExist(Connection conn,String navn)
 	 {
 		 String SQLquerryExists="SELECT \r\n" + 
 			 		"	COUNT(navn)\r\n" + 
@@ -91,7 +102,7 @@ public class Ovelse {
 	 }
 
 	 //Må få tak i øvelsesgruppe
-	 public void addOvelse(Scanner scanner,String navn) throws SQLException
+	 public void addOvelse(Connection conn,Scanner scanner,String navn) throws SQLException
 	 {
 		 System.out.println("Vi fant ikke denne øvelsen i databasen. Ønsker du å legge til "+navn+"?");
 		 String valg=scanner.nextLine();
@@ -103,8 +114,9 @@ public class Ovelse {
 			 String valgtType=scanner.nextLine();
 			 if(valgtType.toLowerCase().equals("i"))
 			 {
-				 addIkkeFastmontert(navn,scanner);
-				 gruppeId=ovelsesGruppe(scanner);
+				 addIkkeFastmontert(conn,navn,scanner);
+				 gruppeId=ovelsesGruppe(conn,scanner);
+				 addSettRepsKilo(conn,navn,scanner,oktId);
 			 }
 			 else if(valgtType.toLowerCase().equals("f"))
 			 {
@@ -113,7 +125,7 @@ public class Ovelse {
 				 int apparatId=apparat.getApparatId();
 				 String apparatNavn=apparat.getNavn();
 				 ovelseId=getOvelseId(conn);
-				 gruppeId=ovelsesGruppe(scanner);
+				 gruppeId=ovelsesGruppe(conn,scanner);
 				 String querryStringOvelse=String.format("INSERT INTO ovelse VALUES('%s','%s','%s')",ovelseId,gruppeId,apparatNavn);
 				 insertQuerry(conn,querryStringOvelse);
 				 String querryStringFastmontert=String.format("INSERT INTO fastmontert('apparatId','ovelseId' VALUES('%d','%s'",ovelseId,apparatId);
@@ -121,20 +133,20 @@ public class Ovelse {
 			 }
 		 }
 	 }
-	 
-	 public void addIkkeFastmontert(String navn,Scanner scanner) throws SQLException
+	 //Legger til ikke fastmontert
+	 public void addIkkeFastmontert(Connection conn,String navn,Scanner scanner) throws SQLException
 	 {
 		 this.navn=navn;
 		 System.out.println("Har du en beskrivelse av "+navn+"?");
 		 this.beskrivelse=scanner.nextLine();
 		 String ovelseId=getOvelseId(conn);
-		 String gruppeId=ovelsesGruppe(scanner);
+		 String gruppeId=ovelsesGruppe(conn,scanner);
 		 String querryStringOvelse=String.format("INSERT INTO ovelse VALUES('%s','%s','%s')",ovelseId,gruppeId,navn);
 		 insertQuerry(conn,querryStringOvelse);
 		 String ikkeFastMontertQuerry=String.format("INSERT INTO ikkefastmontert('ovelseId','beskrivelse') VALUES ('%s','%s'",ovelseId,beskrivelse);
 		 insertQuerry(conn,ikkeFastMontertQuerry);
 	 }
-	 
+	 //Metode som legger inn elementer i databasen
 	 public void insertQuerry(Connection conn, String query)
 	 {
 			try {
@@ -145,15 +157,15 @@ public class Ovelse {
 				System.out.println("SQLException: "+ex.getMessage());
 			}
 	 }
-	 
-	 public String ovelsesGruppe(Scanner scanner) throws SQLException
+	 //Returnerer gruppeId, og sjekker om den eksisterer allerede
+	 public String ovelsesGruppe(Connection conn,Scanner scanner) throws SQLException
 	 {
 		 String gruppeId=null;
 		 System.out.println("Hvilken øvelsesgruppe tilhører øvelsen?");
 		 String valgtGruppe = scanner.nextLine();
-		 if(doesOvelseGruppeExist(valgtGruppe))
+		 if(doesOvelseGruppeExist(conn,valgtGruppe))
 		 {
-			 gruppeId = getGruppeId(valgtGruppe);
+			 gruppeId = getGruppeId(conn,valgtGruppe);
 		 }
 		 else
 		 {
@@ -168,8 +180,8 @@ public class Ovelse {
 			 }
 		 return gruppeId;
 		 } 
-	 
-	 public String getGruppeId(String valgtGruppe)
+	 //returnerer en ny id
+	 public String getGruppeId(Connection conn,String valgtGruppe)
 	 {
 		String gruppeId=null;
 		 try {
@@ -195,7 +207,7 @@ public class Ovelse {
 			}
 		 return gruppeId;
 	 }
-	 
+	 //returner en ny id
 	 public String getOvelseId(Connection conn)
 	 {
 		 try {
@@ -217,7 +229,7 @@ public class Ovelse {
 			}
 		 return "1";
 	 }
-	 
+	 //Finner iden til en eksisterende øvelse
 	 public String getOldOvelseId(Connection conn,String navn)
 	 {
 		 try {
