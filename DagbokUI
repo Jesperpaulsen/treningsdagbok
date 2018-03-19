@@ -26,8 +26,8 @@ public class DagbokUI {
 		boolean running = true;
 
 		String mainUI = "Velkommen til treningsdagboken din! Hva ønsker du å gjøre?\n" + "1: Registrere treningsøkt\n"
-				+ "2: Etterregistrere øvelse til en treningsøkt\n" + "3: Registrere apparat\n"
-				+ "4: Lage ny øvelsesgruppe\n" + "5: Se resultatlogg for en øvelse\n"
+				+ "2: Registrere apparat\n"+"3: Legg til ny øvelsesgruppe\n"
+				+ "4: Finn øvelser i samme øvelsesgruppe\n" + "5: Se resultatlogg for en øvelse\n"
 				+ "6: Se info om siste gjennomførte treningsøkter\n" + "7: Statistikk om øvelsesgruppene dine\n"
 				+ "8: Avslutte programmet";
 
@@ -46,17 +46,20 @@ public class DagbokUI {
 					okt.addOkt(scanner);
 					break;
 				case ("2"):
-					System.out.println("Husker du hvilken id okten din hadde? Ja/Nei");
-					break;
-				case ("3"):
 					System.out.println("Registrer nytt apparat");
 					Apparat apparat = new Apparat(conn);
 					apparat.addApparat(scanner);
 					break;
-				case ("4"):
+				case ("3"):
 					System.out.println("Legg til ny øvelsesgruppe");
 					Ovelsesgruppe gruppe = new Ovelsesgruppe(conn);
 					gruppe.addOvelsesgruppe(scanner);
+					break;
+				case ("4"):
+					System.out.println("Finn øvelser i samme øvelsesgruppe");
+					ViseOvelserIgruppe ovIgruppe = new ViseOvelserIgruppe(conn);
+					ovIgruppe.toString(scanner);
+
 					break;
 				case ("5"):
 					ViseResultater ovelseResultater = new ViseResultater(conn);
