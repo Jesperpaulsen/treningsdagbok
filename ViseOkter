@@ -21,16 +21,19 @@ public class ViseOkter {
 		int i = 0;
 		try {
 			stmt = conn.createStatement();
-			String query = "SELECT \r\n" + "	ovelse.navn\r\n" + "FROM\r\n" + " ovelseprokt\r\n"
-					+ "    INNER JOIN ovelse WHERE ovelse.ovelseId=ovelseprokt.ovelseId\r\n" + "ORDER BY\r\n"
+			String query = "SELECT \r\n" + "	okt.oktId,dato,informasjon,formal,opplevelse\r\n" + "FROM\r\n" + " okt\r\n"
+					+ "    INNER JOIN notat WHERE okt.oktId=notat.oktId\r\n"+ "ORDER BY\r\n"
 					+ "	oktId DESC";
 			if (stmt.execute(query)) {
 				rs = stmt.getResultSet();
 			}
 			while (rs.next() && i < Integer.valueOf(antall)) {
 				i++;
-				String ovelse = rs.getString(1);
-				System.out.println("Øvelse: " + ovelse);
+				String dato=rs.getString(2);
+				String informasjon = rs.getString(3);
+				String formal=rs.getString(4);
+				String opplevelse=rs.getString(5);
+				System.out.println("Informasjon om okt "+dato+": " + informasjon+". Formål med økten: "+formal+". Opplevelse av økten: "+opplevelse+".\n");
 			}
 
 		} catch (SQLException ex) {
